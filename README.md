@@ -44,7 +44,7 @@ mv target/*.jar shared-folder/input/code/
 Copy the JAR file to the Hadoop ResourceManager container:
 
 ```bash
-docker cp shared-folder/input/code/<your-jar-file>.jar resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/
+docker cp shared-folder/input/code/WordCountUsingHadoop-0.0.1-SNAPSHOT.jar resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/
 ```
 
 ### 5. **Move Dataset to Docker Container**
@@ -88,7 +88,7 @@ hadoop fs -put ./input.txt /input/dataset
 Run your MapReduce job using the following command:
 
 ```bash
-hadoop jar /opt/hadoop-3.2.1/share/hadoop/mapreduce/<your-jar-file>.jar com.example.controller.Controller /input/dataset/input.txt /output
+hadoop jar /opt/hadoop-3.2.1/share/hadoop/mapreduce/WordCountUsingHadoop-0.0.1-SNAPSHOT.jar com.example.controller.Controller /input/dataset/input.txt /output
 ```
 
 ### 9. **View the Output**
@@ -116,3 +116,75 @@ To copy the output from HDFS to your local machine:
     docker cp resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/output/ shared-folder/output/
     ```
 3. Commit and push to your repo so that we can able to see your output
+
+
+### REPORT
+
+**Project Overview**
+
+This project implements a word counting system using Hadoop MapReduce framework. The program processes text files to count the frequency of each word across all input files, outputting results in a format where each line contains a word and its total count. The system is designed to be scalable and can handle large text files by leveraging Hadoop's distributed processing capabilities.
+
+**Approach and Implementation**
+
+**Architecture**
+
+The solution follows the MapReduce programming model with three main components:
+
+**Controller:** Orchestrates the MapReduce job
+**Mapper:** Processes input text and emits word-count pairs
+Reducer: Aggregates counts for each word
+
+**Mapper Logic**
+
+The WordMapper class implements the following logic:
+
+Receives input as key-value pairs where:
+
+Key: Line offset in the input file (LongWritable)
+Value: Line content (Text)
+
+For each line:
+
+Splits the line into words using whitespace as delimiter
+Emits each word as a key with value 1
+Filters out empty strings
+
+**Reducer Logic**
+
+The WordReducer class implements the following logic:
+
+Receives input as word and list of counts
+For each word:
+
+Sums up all count values
+Emits the word with its total count
+
+**Challenges Faced & Solutions**
+
+Challenges faced only doing the execution 
+
+Moving Jar file to shared-folder/input - I need to add new folder named "code" which was told by Arvind.
+
+Confused between the files created in HDFS and Local which was again helped by Arvind.
+
+**Sample Input and Output**
+
+**Sample Input (input.txt)**
+```bash
+Hello world
+Hello Hadoop
+Hadoop is powerful
+Hadoop is used for big data
+```
+**Expected Output**
+```bash
+Hadoop  3
+Hello   2
+is      2
+big     1
+data    1
+for     1
+powerful 1
+used    1
+world   1
+```
